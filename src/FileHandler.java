@@ -6,15 +6,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class FileHandler {
-	public String missingDataChar;
+	private String missingDataChar;
 	public String targetAttribute;
 	public int targetAttributeIndex;
 	public int attributeCount;
 	public int recordCount;
-	ArrayList<Integer> valuesPerAttribute;
+	public ArrayList<Integer> valuesPerAttribute;
 	private ArrayList<Attribute> attributes;
 	private ArrayList<Record> records;
 	private ArrayList<IOArray> ipop;
+	public int inputSize;
+	public int outputSize;
 
 	public ArrayList<Attribute> readAttributes(String fileName) {
 		attributes = new ArrayList<Attribute>();
@@ -231,6 +233,8 @@ public class FileHandler {
 				}
 			}
 			ip.add(1.0); // bias input
+			inputSize = ip.size();
+			outputSize = op.size();
 			IOArray obj = new IOArray();
 			obj.setInput(ip.toArray(new Double[0]));
 			obj.setOutput(op.toArray(new Double[0]));
