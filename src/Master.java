@@ -2,10 +2,12 @@ import java.util.ArrayList;
 
 public class Master {
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		String dataset = "voting";
-		int hidden = Integer.parseInt("2");
-		int nodes = Integer.parseInt("5");
+		String dataset = "tictactoe";
+		int hidden = Integer.parseInt("0");
+		int nodes = Integer.parseInt("2");
+		Double learningRate = Double.parseDouble("0.1");
 		FileHandler reader = new FileHandler();
 		ArrayList<Attribute> attributes = new ArrayList<Attribute>();
 		ArrayList<Record> records = new ArrayList<Record>();
@@ -93,14 +95,81 @@ public class Master {
 				}
 			}
 
-			int epoch = 1;
 			NeuralNet ANN = new NeuralNet();
-			for (int e = 0; e < 1000; e++) { // TODO: change this
+			ArrayList<Layer> bestNetwork = new ArrayList<Layer>();
+			Double mse = 0.0;
+			Double bestMSE = Double.MAX_VALUE;
+			int epoch = 1;
+			do {
 				for (IOArray data : trainingData) {
 					ANN.feedForward(network, data.getInput());
-					ANN.backPropagate(network, data.getOutput());
+					ANN.backPropagate(network, data.getOutput(), learningRate);
+				}
+				Double error = 0.0;
+				for (IOArray data : validationData) {
+					error += ANN.validate(network, data.getInput(), data.getOutput());
+				}
+				mse = error / validationData.size();
+				if (mse < bestMSE) {
+					bestMSE = mse;
+					bestNetwork = new ArrayList<Layer>();
+					for (int l = 0; l < network.size(); l++) {
+						bestNetwork.add(new Layer(network.get(l)));
+					}
+				}
+				epoch++;
+			} while (epoch < 100);
+
+			do {
+				for (IOArray data : trainingData) {
+					ANN.feedForward(network, data.getInput());
+					ANN.backPropagate(network, data.getOutput(), learningRate);
+				}
+				Double error = 0.0;
+				for (IOArray data : validationData) {
+					error += ANN.validate(network, data.getInput(), data.getOutput());
+				}
+				mse = error / validationData.size();
+				if (mse < bestMSE) {
+					bestMSE = mse;
+					bestNetwork = new ArrayList<Layer>();
+					for (int l = 0; l < network.size(); l++) {
+						bestNetwork.add(new Layer(network.get(l)));
+					}
+				}
+				epoch++;
+			} while (epoch < 5000 && mse <= bestMSE);
+
+			int firstBreak = epoch;
+			while (epoch < 2 * firstBreak) {
+				for (IOArray data : trainingData) {
+					ANN.feedForward(network, data.getInput());
+					ANN.backPropagate(network, data.getOutput(), learningRate);
+				}
+				Double error = 0.0;
+				for (IOArray data : validationData) {
+					error += ANN.validate(network, data.getInput(), data.getOutput());
+				}
+				mse = error / validationData.size();
+				if (mse < bestMSE) {
+					bestMSE = mse;
+					bestNetwork = new ArrayList<Layer>();
+					for (int l = 0; l < network.size(); l++) {
+						bestNetwork.add(new Layer(network.get(l)));
+					}
+				}
+				epoch++;
+			}
+
+			// test the network
+			int passed = 0;
+			for (IOArray data : testingData) {
+				if (ANN.test(bestNetwork, data.getInput(), data.getOutput())) {
+					passed++;
 				}
 			}
+			Double accuracy = passed / (double) testingData.size();
+			System.out.println("Accuracy: " + accuracy);
 		}
 	}
 }

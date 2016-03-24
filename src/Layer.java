@@ -13,6 +13,12 @@ public class Layer {
 		this.delta = new Double[cols];
 	}
 
+	public Layer(Layer copy) {
+		this.weightMatrix = new Matrix(copy.weightMatrix);
+		this.input = new Double[copy.input.length];
+		this.output = new Double[copy.output.length];
+	}
+
 	public void setInput(Double[] in) {
 		this.input = in;
 	}
@@ -43,6 +49,10 @@ public class Layer {
 
 	public Double[] getMatrixCol(int col) {
 		return this.weightMatrix.getCol(col);
+	}
+
+	public void setMatrixCol(int col, Double[] data) {
+		this.weightMatrix.setCol(col, data);
 	}
 
 	public Double[] getMatrixRow(int row) {

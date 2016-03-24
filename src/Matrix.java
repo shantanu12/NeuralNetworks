@@ -6,6 +6,15 @@ public class Matrix {
 		this.matrix = new Double[rows][cols];
 	}
 
+	public Matrix(Matrix copy) {
+		this.matrix = new Double[copy.getRowCount()][copy.getColCount()];
+		for (int i = 0; i < copy.getRowCount(); i++) {
+			for (int j = 0; j < copy.getColCount(); j++) {
+				this.matrix[i][j] = copy.matrix[i][j];
+			}
+		}
+	}
+
 	public int getRowCount() {
 		return this.matrix.length;
 	}
@@ -25,6 +34,12 @@ public class Matrix {
 		}
 
 		return newMatrix;
+	}
+
+	public void setCol(int col, Double[] data) {
+		for (int i = 0; i < getRowCount(); i++) {
+			this.matrix[i][col] = data[i];
+		}
 	}
 
 	public void randomize() {
